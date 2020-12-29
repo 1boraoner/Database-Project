@@ -7,7 +7,7 @@ import classes as entity
 from werkzeug.utils import secure_filename
 from PIL import Image
 import io
-
+import base64
 
 url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
 app = Flask(__name__)
@@ -137,10 +137,18 @@ def artist_page(name):
             cursor = connection.cursor()
             cmd = """SELECT * FROM photograph WHERE artist_id=%s"""
             cursor.execute(cmd, (curr_artist_id,))
-            photos = cursor.fetchall()
+            photos_raw = cursor.fetchall()
             cursor.close()
 
-        return render_template("artist_page.html", name = name, artist_sess = curr_artist,artist_port = portfolio, photos =photos)
+            photos =list()
+            for i in range(len(photos_raw)):
+                photos.append(photos_raw[i][6])
+                photos[i] = photos[i].tobytes()
+                photos[i] = base64.b64encode(photos[i])  ##b64 encoding
+                photos[i] = photos[i].decode()
+
+            print(photos)
+        return render_template("artist_page.html", name = name, artist_sess = curr_artist,artist_port = portfolio, photos_raw =photos_raw, photos =photos)
 
 
 
@@ -161,6 +169,7 @@ def upload(name):
 
         image = request.files["filename"]
         content = image.read()
+        print(content)
         print(type(content))
 
         category = request.form["category"]
@@ -175,11 +184,17 @@ def upload(name):
             connection.commit()
             cursor.close()
 
-        image_data = inserted_im  # byte values of the image
-        image_s = Image.open(io.BytesIO(image_data))
-        image_s.show()
+        image_s = inserted_im.tobytes()
+        encoded = base64.b64encode(image_s) ##b64 encoding
+        str=  encoded.decode() ## b' atar
+        #image_data = inserted_im  # byte values of the image
+        #image_s = Image.open(io.BytesIO(image_data))
+        #image_s.show()
 
-    return render_template("upload.html")
+        return render_template("upload.html", inserted = str, raw = content)
+
+    if request.method == "GET":
+        return render_template("upload.html", inserted ="")
 
 
 @app.route("/home/user_page")
