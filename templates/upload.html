@@ -1,0 +1,27 @@
+{% extends "layout.html" %} 
+{% block title %}Image Upload{% endblock %}
+
+{% block content %}
+    <br>
+    <br>
+    <br>
+    <br>
+<a href="{{url_for('artist_page',name=name) }}">ARTIST PAGE</a>
+
+<form class="was-validated" action="" method="post" enctype = "multipart/form-data">
+  <div class="custom-file">
+    <input type="file" id="filename" name="filename" />
+    <input type="text" id="photo_name" name="photo_name" />
+    <input type="text" id="category" name="category" />
+    <input type="text" id="details" name="details" />
+    <input type="text" id="location"  name="location" />
+
+    <input type="submit" value="submit"/>
+  </div>
+</form>
+
+<img src="data:image/jpeg;base64,{{inserted}}" height=100px width=100px alt="No image"/>
+<br>
+<br>
+
+{% endblock %}

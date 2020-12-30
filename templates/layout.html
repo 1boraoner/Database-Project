@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>My movies -
+        {% block title %}   
+       
+       
+       {% endblock %}
+    </title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}"/>
+    </head>
+  <body>
+
+    <header>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('home_page')}}" > Home Page </a> </li>
+          <li><a href="{{ url_for('signup_page') }}">Sign Up</a></li>
+          <li><a href="{{ url_for('login_page') }}">Login</a></li>
+          <li><a href="{{ url_for('deneme') }}">DENEME</a></li>
+        </ul>
+      </nav>
+    </header>
+
+  
+  
+    {% block content %}
+    
+   
+    {% endblock %}
+
+    {% block scripts %}
+
+    {% endblock %}
+    <footer>
+      <small>Bora Öner Databse Project 2021</small>
+    </footer>
+  </body>
+</html>

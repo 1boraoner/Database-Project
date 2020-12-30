@@ -1,0 +1,12 @@
+{% extends "layout.html" %} 
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+
+  <h2> Welcome To Photography World</h2>
+
+  <div class="slideshow">
+    <image src="{{ url_for('static', filename='image#1.jpg') }}" width="300" height="200" alt="Image Not Found"></image>
+  </div>
+    
+{% endblock %}

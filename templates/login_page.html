@@ -1,0 +1,35 @@
+{% extends "layout.html" %} 
+{% block title %}Login Page{% endblock %}
+
+{% block content %}
+<br>
+<br>
+<br>
+<br>
+<form method="post">
+  <div class="form-group">
+    <label for="exampleInputEmail1">Name</label>
+    <input type="text" class="form-control" name="name" aria-describedby="emailHelp" placeholder="Enter Name">
+    <small id="namehelp" class="form-text text-muted">This section is mandatory to fill.</small>
+  </div>
+    <div class="form-group">
+    <label for="exampleInputEmail1">Surnname</label>
+    <input type="text" class="form-control" name="surname" aria-describedby="emailHelp" placeholder="Enter Surname">
+    <small id="surhelp" class="form-text text-muted">This section is mandatory to fill.</small>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">Password</label>
+    <input type="password" class="form-control" name="password" placeholder="Password">
+  </div>
+  <div class="form-check">
+    <input type="checkbox" class="form-check-input" name="type">
+    <label class="form-check-label" for="exampleCheck1">If you want to sign in as Artist</label>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+    
+{% endblock %}
+
