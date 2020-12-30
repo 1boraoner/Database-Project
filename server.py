@@ -86,6 +86,7 @@ def login_page():
                     session["occupy_id"] = sess_artist.artist_id
                     print(session)
                     print(sess_artist)
+
                     return redirect(url_for("artist_page", name =str(sess_artist.name)+"_"+str(sess_artist.surname)))
         else:
             sess_user = entity.artist(data["name"], data["surname"], data["password"])
@@ -192,15 +193,15 @@ def upload(name):
         encoded = base64.b64encode(image_s) ##b64 encoding
         str=  encoded.decode() ## b' atar
 
-        return render_template("upload.html", inserted = str, raw = content)
+        return render_template("upload.html", name=name, inserted = str, raw = content) ##raw silinebilir debugda kullanılmıştı
 
     if request.method == "GET":
         print(name)
         return render_template("upload.html", name=name, inserted ="")
 
 
-@app.route("/exhibition", methods=["GET","POST"])
-def create_exhibition():
+@app.route("/artist/<name>/exhibition_create", methods=["GET","POST"])
+def create_exhibition(name):
     if "flag" in session:
         curr_artist_id = session["occupy_id"]
     else:
@@ -243,13 +244,13 @@ def create_exhibition():
                 connection.commit()
             cursor.close()
 
-        return render_template(url_for("exhibition"), exhb_name = exhb_name )
+        return redirect(url_for("artist_page", name = name))
 
-    return render_template("create_exhibition.html", photo_string = photos_raw, photo_cont= photos)
+    return render_template("create_exhibition.html", name=name, photo_string = photos_raw, photo_cont= photos)
 
-@app.route("/artist/<exhb_name>")
-def exhibition(exhb_name):
-    return "<h1> Hello To {{exhb_name}} </h1>"
+@app.route("/artist/<name>/exhibition", methods=["GET","POST"])
+def exhibition(name):
+    return render_template("exhibition.html")
 
 
 
