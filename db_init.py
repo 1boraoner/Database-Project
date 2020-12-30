@@ -14,12 +14,11 @@ INIT_DB = [
         PRIMARY KEY(artist_id)
     )""",
 
-    """CREATE TABLE IF NOT EXISTS exhibition(
+    """CREATE TABLE IF NOT EXISTS exib_content(
+        photo_id INT UNIQUE NOT NULL,
         exhibition_id INT NOT NULL,
-        date_inf VARCHAR(50) NULL,
-        duration INT NULL,
-        visitor_count INT NULL,
-        PRIMARY KEY(exhibition_id)
+        artist_id INT NOT NULL,
+        PRIMARY KEY(photo_id)
     )""",
 
     """CREATE TABLE IF NOT EXISTS portfolio(
@@ -36,6 +35,7 @@ INIT_DB = [
         photo_id SERIAL,
         artist_id INT NOT NULL,
         portfolio_id INT NOT NULL,
+        photo_name VARCHAR(100) NOT NULL,
         category VARCHAR(50) NULL,
         location_info VARCHAR(150) NULL, 
         tec_details VARCHAR(200) NULL,
@@ -43,6 +43,16 @@ INIT_DB = [
         FOREIGN KEY(artist_id) REFERENCES photographer(artist_id),
         FOREIGN KEY(portfolio_id) REFERENCES portfolio(portfolio_id),
         PRIMARY KEY(photo_id)
+    )""",
+
+    """CREATE TABLE IF NOT EXISTS exhibition(
+        exhibition_id INT UNIQUE NOT NULL,
+        exhibition_name VARCHAR(100) NOT NULL,
+        date_inf VARCHAR(50) NULL,
+        duration INT NULL,
+        visitor_count INT DEFAULT 0,
+        artist_id INT NOT NULL,
+        PRIMARY KEY(exhibition_id)
     )""",
 
     """CREATE TABLE IF NOT EXISTS users(
@@ -57,9 +67,15 @@ INIT_DB = [
     """CREATE TABLE IF NOT EXISTS fav_list(
         fav_list_id SERIAL NOT NULL,
         user_id INT NOT NULL,
-        photo_ids INT NULL,
+        list_name VARCHAR(50) NOT NULL,
         PRIMARY KEY(fav_list_id),
         FOREIGN KEY(user_id) REFERENCES users(user_id)  
+    )""",
+
+    """CREATE TABLE IF NOT EXISTS fav_content(
+        photo_id INT NOT NULL,
+        fav_list_id INT NOT NULL,
+        PRIMARY KEY(photo_id)
     )"""
 ]
 url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """

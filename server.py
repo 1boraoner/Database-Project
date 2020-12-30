@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 import io
 import base64
+from random import randint
 
 url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
 app = Flask(__name__)
@@ -48,10 +49,12 @@ def signup_page():
                 cursor.execute(cmd,new_inf)
 
                 the_user_id = cursor.fetchone()[0]
+                print(the_user_id)
                 connection.commit()
 
-                cmd = """ INSERT INTO fav_list(user_id) VALUES(%s)"""
-                cursor.execute(cmd,(the_user_id,))
+                full_name = str(new_user.name) + " "+ str(new_user.surname)
+                cmd = """ INSERT INTO fav_list(user_id,list_name) VALUES(%s,%s)"""
+                cursor.execute(cmd,(the_user_id,full_name))
                 connection.commit()
 
                 cursor.close()
@@ -142,11 +145,11 @@ def artist_page(name):
 
             photos =list()
             for i in range(len(photos_raw)):
-                photos.append(photos_raw[i][6])
+                photos.append(photos_raw[i][7])
+                print(type(photos_raw[i][7])) ## image content index i değişebilir dikkat et
                 photos[i] = photos[i].tobytes()
                 photos[i] = base64.b64encode(photos[i])  ##b64 encoding
                 photos[i] = photos[i].decode()
-
             print(photos)
         return render_template("artist_page.html", name = name, artist_sess = curr_artist,artist_port = portfolio, photos_raw =photos_raw, photos =photos)
 
@@ -175,11 +178,12 @@ def upload(name):
         category = request.form["category"]
         location_info = request.form["details"]
         tec_details = request.form["location"]
+        photo_name = request.form["photo_name"]
 
         with dbapi2.connect(url) as connection:
             cursor = connection.cursor()
-            cmd = """INSERT INTO photograph(artist_id,portfolio_id,category,location_info,tec_details,image_cont) VALUES(%s,%s,%s,%s,%s,%s) RETURNING image_cont"""
-            cursor.execute(cmd,(curr_artist_id,portfolio_id,category,location_info,tec_details,content))
+            cmd = """INSERT INTO photograph(artist_id,portfolio_id,photo_name,category,location_info,tec_details,image_cont) VALUES(%s,%s,%s,%s,%s,%s,%s) RETURNING image_cont"""
+            cursor.execute(cmd,(curr_artist_id,portfolio_id,photo_name,category,location_info,tec_details,content))
             inserted_im = cursor.fetchone()[0]
             connection.commit()
             cursor.close()
@@ -187,14 +191,66 @@ def upload(name):
         image_s = inserted_im.tobytes()
         encoded = base64.b64encode(image_s) ##b64 encoding
         str=  encoded.decode() ## b' atar
-        #image_data = inserted_im  # byte values of the image
-        #image_s = Image.open(io.BytesIO(image_data))
-        #image_s.show()
 
         return render_template("upload.html", inserted = str, raw = content)
 
     if request.method == "GET":
-        return render_template("upload.html", inserted ="")
+        print(name)
+        return render_template("upload.html", name=name, inserted ="")
+
+
+@app.route("/exhibition", methods=["GET","POST"])
+def create_exhibition():
+    if "flag" in session:
+        curr_artist_id = session["occupy_id"]
+    else:
+        return render_template("home_page.html")
+
+
+    with dbapi2.connect(url) as connection:
+        cursor = connection.cursor()
+        cmd = """SELECT * FROM photograph WHERE artist_id=%s"""
+        cursor.execute(cmd, (curr_artist_id,))
+        photos_raw = cursor.fetchall()
+        cursor.close()
+
+
+#        photo_cont = map(lambda image:base64.b64encode(image.tobytes()).decode(), photo_cont)
+        photos = list()
+        for i in range(len(photos_raw)):
+            photos.append(photos_raw[i][7])
+            photos[i] = photos[i].tobytes()
+            photos[i] = base64.b64encode(photos[i])  ##b64 encoding
+            photos[i] = photos[i].decode()
+
+    if request.method == "POST":
+
+        exhb_id = randint(1,100000)
+        exhb_name = request.form["exhb_name"]
+        date_inf = request.form["date_inf"]
+        duration = request.form["duration"]
+        photo_ids = request.form.getlist("checked")
+        print(photo_ids)
+
+        with dbapi2.connect(url) as connection:
+            cursor = connection.cursor()
+            cmd = """INSERT INTO exhibition(exhibition_id,exhibition_name,date_inf,duration,artist_id) VALUES(%s,%s,%s,%s,%s)"""
+            cursor.execute(cmd,(exhb_id,exhb_name,date_inf,duration,curr_artist_id))
+            connection.commit()
+            cmd = """INSERT INTO exib_content(photo_id, exhibition_id,artist_id) VALUES(%s,%s,%s)"""
+            for id in photo_ids:
+                cursor.execute(cmd,(id,exhb_id,curr_artist_id))
+                connection.commit()
+            cursor.close()
+
+        return render_template(url_for("exhibition"), exhb_name = exhb_name )
+
+    return render_template("create_exhibition.html", photo_string = photos_raw, photo_cont= photos)
+
+@app.route("/artist/<exhb_name>")
+def exhibition(exhb_name):
+    return "<h1> Hello To {{exhb_name}} </h1>"
+
 
 
 @app.route("/home/user_page")
