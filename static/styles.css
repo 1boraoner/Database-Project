@@ -1,0 +1,23 @@
+h1{
+    color:red;
+    text-align: center;
+}
+h2{
+    text-align: center;
+    color:red;
+}
+footer {
+    text-align: center;
+}
+li {
+   float: left;
+}
+.slideshow{
+    align-items: center;
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+    background-color: red;
+}
