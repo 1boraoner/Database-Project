@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block title %}Artıst Resume Page{% endblock %}
+
+
+{% block content %}
+<h1> WELCOME TO {{artist[1] + artist[2]}} WEB PAGE</h1>
+
+<br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <h1> HELLO {{name}}!</h1>
+    <h1>{{artist_sess}}</h1>
+    <h1>{{artist_port}}</h1>
+    <br>
+    <br>
+
+    <ul>
+    {% for i in range(photos_raw|length) %}
+        <li><p>{{photos_raw[i]}} </p> </li>
+        <li><img src="data:image/jpeg;base64,{{photos[i]}}" width=200px height=300px /></li>
+    {% endfor %}
+    </ul>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+{% endblock %}
