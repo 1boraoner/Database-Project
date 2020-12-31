@@ -250,7 +250,18 @@ def create_exhibition(name):
 
 @app.route("/artist/<name>/exhibition", methods=["GET","POST"])
 def exhibition(name):
-    return render_template("exhibition.html")
+
+    if "flag" in session:
+        curr_artist_id = session["occupy_id"]
+    else:
+        return render_template("home_page.html")
+
+
+    if request.method == "GET":
+        
+
+
+        return render_template("exhibition.html")
 
 
 
@@ -260,14 +271,80 @@ def user_page():
 
 
 
-@app.route("/home/deneme", methods=["GET","POST"])
+@app.route("/home/deneme", methods=["GET","POST"]) ##platform main page sends {exhibition_ids,exhib_name} and artist_ids, artist_name_surname
 def deneme():
-    if request.method == "POST":
-        data = request.form
-        print(data)
-        return render_template("home_page.html")
-    else:
-        return render_template("deneme.html")
+
+    if request.method == "GET":
+        with dbapi2.connect(url) as connection:
+            cursor = connection.cursor()
+            cmd_1 = """SELECT artist_id,artist_name,artist_surname FROM photographer """ ##get all artist
+            cursor.execute(cmd_1)
+            art_data = cursor.fetchall()
+            connection.commit()
+
+            cmd_2 = """SELECT exhibition_id, exhibition_name FROM exhibition """
+            cursor.execute(cmd_2)
+            exhb_data = cursor.fetchall()
+            connection.commit()
+
+            cursor.close()
+
+        print(type(art_data[0][0]))
+        print(type(exhb_data))
+
+        dict_art = dict()
+        dict_exhb = dict()
+
+        for i in range(len(art_data)):
+            dict_art.update({art_data[i][0] : str(str(art_data[i][1]) +" " + str(art_data[i][2]))})
+
+        for j in range(len(exhb_data)):
+            dict_exhb.update({exhb_data[j][0]: str(exhb_data[j][1])})
+        print(dict_exhb)
+        print(dict_art)
+
+    return render_template("platform.html", artists  = dict_art, exhibs = dict_exhb)
+
+@app.route("/platform/exhibs/<name><aid>", methods=["GET","POST"]) ##print artist_portfolio
+def artist_res(name,aid):
+    print(aid)
+    if request.method == "GET":
+
+        with dbapi2.connect(url) as connection:
+            cursor = connection.cursor()
+            cmd = """SELECT * FROM photographer WHERE artist_id=%s"""
+            cursor.execute(cmd, (aid,))
+            curr_artist = cursor.fetchone()
+            cursor.close()
+
+        with dbapi2.connect(url) as connection:
+            cursor = connection.cursor()
+            cmd = """SELECT * FROM portfolio WHERE artist_id=%s"""
+            cursor.execute(cmd, (aid,))
+            portfolio = cursor.fetchall()
+            cursor.close()
+
+        with dbapi2.connect(url) as connection:
+            cursor = connection.cursor()
+            cmd = """SELECT * FROM photograph WHERE artist_id=%s"""
+            cursor.execute(cmd, (aid,))
+            photos_raw = cursor.fetchall()
+            cursor.close()
+
+            photos = list()
+            for i in range(len(photos_raw)):
+                photos.append(photos_raw[i][7])
+                photos[i] = photos[i].tobytes()
+                photos[i] = base64.b64encode(photos[i])  ##b64 encoding
+                photos[i] = photos[i].decode()
+
+    return render_template("artist_res.html", artist = curr_artist, portfolio = portfolio, photos_raw =photos_raw, photos =photos)
+
+
+@app.route("/platform/<exhib_name><eid>",methods=["GET","POST"])
+def exhib_ser(exhib_name,eid):
+
+    return render_template("exhibition_pub.html")
 
 
 if __name__ == "__main__":
