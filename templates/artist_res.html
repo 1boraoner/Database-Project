@@ -3,32 +3,64 @@
 
 
 {% block content %}
-<h1> WELCOME TO {{artist[1] + artist[2]}} WEB PAGE</h1>
+<h1>{{artist[1] + artist[2]}}</h1>
 
-<br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <h1> HELLO {{name}}!</h1>
-    <h1>{{artist_sess}}</h1>
-    <h1>{{artist_port}}</h1>
-    <br>
-    <br>
+<div class="row">
+    <div class="col-2">
+        <image src="{{url_for('static', filename='artist.png')}}"> </image>
+    </div>
+    <div class="col-6">
+        <p> Artist Full Name = {{artist[1]}} {{artist[2]}}</p>
+        <p> Nationality = {{artist[3]}}</p>
+        <p> Contact Address = {{artist[4]}}</p>
+        <p> Preferred/Dominant Photo Style = {{artist[5]}}</p>
+    </div>
+    <div class="col-4">
+        <p> Available Exhibition</p>
+        <p> Exhibition Link </p>
+    </div>
+</div>
 
-    <ul>
-    {% for i in range(photos_raw|length) %}
-        <li><p>{{photos_raw[i]}} </p> </li>
-        <li><img src="data:image/jpeg;base64,{{photos[i]}}" width=200px height=300px /></li>
-    {% endfor %}
-    </ul>
+<div class="row">
+    <div class ="col-9">
+        <p> {{portfolio[4]}}</p>
+    </div>
+    <div class="row">
+        <p>Portfolio Creation Date = <time> {{portfolio[3]}}</time>  </p>
+    </div>
+</div>
+
+<form method="post">
     <br>
     <br>
-    <br>
-    <br>
-    <br>
-    <br>
+    {% if user_flag == True%}
+    <p><input type="submit" value="submit"/> Add Selected To My Favs</p>
+    {% endif %}
+    <div class="container">
+        <div class="row">
+      {% for i in range(photos_raw|length) %}
+        {% if loop.index%5 == 0 and loop.index != 0%}
+        </div>
+        <div class="row">
+        {% endif %}
+            <div class="col md-4">
+              <div class="card shadow-sm">
+                <img src="data:image/jpeg;base64,{{photos[i]}}" class=" rounded img-fluid " />
+                  <p class="card-text"> Photograph Name = {{photos_raw[i][3]}}</p>
+                  <p class="card-text">Category =  {{photos_raw[i][4]}}</p>
+                  <p class="card-text">Location Infortmation = {{photos_raw[i][5]}}</p>
+                  <p class="card-text">Technical Details = {{photos_raw[i][6]}}</p>
+                    {% if user_flag == True%}
+                        <p> <input type="checkbox" name="user_fav_add" value="{{photos_raw[i][0]}}"/> ADD TO MY FAVS</p>
+                    {% endif %}
+              </div>
+            </div>
+      {% endfor %}
+    </div>
+    </div>
+</form>
+
+
+
 
 {% endblock %}

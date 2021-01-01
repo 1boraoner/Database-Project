@@ -15,13 +15,24 @@
   <body>
 
     <header>
-      <nav>
-        <ul>
-          <li><a href="{{ url_for('home_page')}}" > Home Page </a> </li>
-          <li><a href="{{ url_for('signup_page') }}">Sign Up</a></li>
-          <li><a href="{{ url_for('login_page') }}">Login</a></li>
-          <li><a href="{{ url_for('deneme') }}">DENEME</a></li>
-        </ul>
+      <nav class="navbar navbar-dark  bg-dark">
+        <div class="">
+          {% if session["flag"]==0 %}
+            <a class="nav-item" href="{{ url_for('home_page')}}" > Home Page </a>
+            <a class="nav-item" href="{{ url_for('signup_page') }}"> Sign Up </a>
+            <a class="nav-item" href="{{ url_for('login_page') }}"> Login </a>
+          {% else %}
+            <a class="nav-item" href="{{ url_for('deneme') }}"> Platform Main Page </a>
+            {% if session["type"] == "artist"%}
+              <a class="nav-item" href="{{ url_for('artist_page', name=session['occupy_name'] )}}"> My Profile </a>
+            {% else %}
+              <a class="nav-item" href="{{ url_for('user_page') }}"> My Profile </a>
+            {% endif %}
+            <a class="nav-item ml-auto" href="{{ url_for('logout_page')}}"> Log Out </a>
+
+          {% endif %}
+
+        </div>
       </nav>
     </header>
 

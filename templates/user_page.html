@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-2">
+        <image src="{{url_for('static', filename='artist.png')}}"> </image>
+    </div>
+    <div class="col-6">
+        <p> Artist Full Name = {{user_inf[1]}} {{user_inf[2]}}</p>
+        <p> Nationality = {{user_inf[3]}}</p>
+        <p> Contact Address = {{user_inf[4]}}</p>
+    </div>
+</div>
+
+<h1> {{fav_inf}}'s Favourites List</h1>
+<div class="container">
+    <div class="row">
+  {% for i in range(photos_raw|length) %}
+    {% if loop.index%5 == 0 and loop.index != 0%}
+    </div>
+    <div class="row">
+    {% endif %}
+        <div class="col md-4">
+          <div class="card shadow-sm">
+            <img src="data:image/jpeg;base64,{{photos[i]}}" class=" rounded img-fluid " />
+              <p class="card-text"> Photographer Name = {{photos_raw[i][0][3]}}</p>
+              <p class="card-text"> Photograph Name = {{photos_raw[i][0][3]}}</p>
+              <p class="card-text">Category =  {{photos_raw[i][0][4]}}</p>
+              <p class="card-text">Location Infortmation = {{photos_raw[i][0][5]}}</p>
+              <p class="card-text">Technical Details = {{photos_raw[i][0][6]}}</p>
+          </div>
+        </div>
+  {% endfor %}
+</div>
+</div>
+
+{% endblock %}
