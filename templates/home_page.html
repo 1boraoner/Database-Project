@@ -4,9 +4,26 @@
 {% block content %}
 
   <h2> Welcome To Photography World</h2>
-
-  <div class="slideshow">
-    <image src="{{ url_for('static', filename='image#1.jpg') }}" width="300" height="200" alt="Image Not Found"></image>
+<!--
+<image src="{{ url_for('static', filename='image#1.jpg') }}" width="300" height="200" alt="Image Not Found"></image>
+-->
+<div class="container">
+  <div class="row">
+    <div class="col-5">
+      <img class="img-fluid"  src="{{ url_for('static', filename='image#1.jpg') }}" alt="First slide">
+    </div>
+    <div class="col-5">
+      <img class="img-fluid"  src="{{ url_for('static', filename='image#2.jpg') }}" alt="Second slide">
+    </div>
   </div>
-    
+  <br>
+  <div class="row">
+    <div class="col-5">
+      <img class="img-fluid"  src="{{ url_for('static', filename='images#3.jpg') }}" alt="Third slide">
+    </div>
+    <div class="col-5">
+      <img class="img-fluid"  src="{{ url_for('static', filename='images#4.jpg') }}" alt="Fourth slide">
+    </div>
+  </div>
+</div>
 {% endblock %}

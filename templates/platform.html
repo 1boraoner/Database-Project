@@ -44,9 +44,9 @@
     {% if loop.index%4 == 0 and loop.index != 0%}
       </tr>
       <tr>
-      <td scope="row"> <a href="{{url_for('exhib_ser', eid =exhib_id, exhib_name=exhibs[exhib_id])}}"> <image src="{{url_for('static', filename='exhibition.jpg')}}" width="150px" height="150px"/>{{exhibs[exhib_id]}}, {{exhib_id}}</a> </td>
+      <td scope="row"> <a href="{{url_for('exhib_ser', eid =exhib_id )}}"> <image src="{{url_for('static', filename='exhibition.jpg')}}" width="150px" height="150px"/>{{exhibs[exhib_id]}}, {{exhib_id}}</a> </td>
     {%else%}
-      <td scope="row"> <a href="{{url_for('exhib_ser', eid =exhib_id, exhib_name=exhibs[exhib_id])}}"> <image src="{{url_for('static', filename='exhibition.jpg')}}" width="200px" height="200px"/>{{exhibs[exhib_id]}}, {{exhib_id}}</a> </td>
+      <td scope="row"> <a href="{{url_for('exhib_ser', eid =exhib_id)}}"> <image src="{{url_for('static', filename='exhibition.jpg')}}" width="200px" height="200px"/>{{exhibs[exhib_id]}}, {{exhib_id}}</a> </td>
     {% endif %}
 
   {% endfor %}

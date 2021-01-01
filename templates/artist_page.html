@@ -2,33 +2,56 @@
 {% block title %}Image Upload{% endblock %}
 
 {% block content %}
-    <br>
-    <br>
-    <br>
-    <p> <a href="{{url_for('create_exhibition', name=name)}}"> Create an Exhibition </a> </p>
-    <p><a href=" {{url_for('exhibition', name=name)}}"> My Exhibitions </a></p>
-    <p><a href="{{ url_for('upload',name=name) }}">Image Upload</a></p>
-    <br>
-    <br>
-    <br>
-    <br>
     <h1> HELLO {{name}}!</h1>
-    <h1>{{artist_sess}}</h1>
-    <h1>{{artist_port}}</h1>
-    <br>
-    <br>
 
-    <ul>
-    {% for i in range(photos_raw|length) %}
-        <li><p>{{photos_raw[i]}} </p> </li>
-        <li><img src="data:image/jpeg;base64,{{photos[i]}}" width=200px height=300px /></li>
-    {% endfor %}
-    </ul>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
+<div class="row">
+    <div class="col-2">
+        <image src="{{url_for('static', filename='artist.png')}}"> </image>
+    </div>
+    <div class="col-6">
+        <p> Artist Full Name = {{artist_sess[1]}} {{artist_sess[2]}}</p>
+        <p> Nationality = {{artist_sess[3]}}</p>
+        <p> Contact Address = {{artist_sess[4]}}</p>
+        <p> Preferred/Dominant Photo Style = {{artist_sess[5]}}</p>
+    </div>
+    <div class="col-4">
+        <p> Available Exhibition</p>
+        <p> Exhibition Link </p>
+        <p><a href="{{url_for('create_exhibition', name=name)}}"> Create an Exhibition </a> </p>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class ="col-9">
+        <p> {{artist_port[4]}}</p>
+    </div>
+    <div class="row">
+        <p>Portfolio Creation Date = <time> {{artist_port[3]}}</time>  </p>
+    </div>
+</div>
+
+<br>
+<br>
+<div class="container">
+    <p><a href="{{ url_for('upload',name=name) }}">Image Upload</a></p>
+    <div class="row">
+  {% for i in range(photos_raw|length) %}
+    {% if loop.index%5 == 0 and loop.index != 0%}
+    </div>
+    <div class="row">
+    {% endif %}
+        <div class="col md-4">
+          <div class="card shadow-sm">
+            <img src="data:image/jpeg;base64,{{photos[i]}}" class=" rounded img-fluid " />
+              <p class="card-text"> Photograph Name = {{photos_raw[i][3]}}</p>
+              <p class="card-text">Category =  {{photos_raw[i][4]}}</p>
+              <p class="card-text">Location Infortmation = {{photos_raw[i][5]}}</p>
+              <p class="card-text">Technical Details = {{photos_raw[i][6]}}</p>
+          </div>
+        </div>
+  {% endfor %}
+</div>
+</div>
 
 {% endblock %}

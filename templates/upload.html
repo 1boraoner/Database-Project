@@ -2,6 +2,7 @@
 {% block title %}Image Upload{% endblock %}
 
 {% block content %}
+<!--
     <br>
     <br>
     <br>
@@ -11,17 +12,67 @@
 <form class="was-validated" action="" method="post" enctype = "multipart/form-data">
   <div class="custom-file">
     <input type="file" id="filename" name="filename" />
+    <label>Photography Name:</label>
     <input type="text" id="photo_name" name="photo_name" />
+    <label>Category Information:</label>
     <input type="text" id="category" name="category" />
+    <label>Techical Details:</label>
     <input type="text" id="details" name="details" />
+    <label> The Location Information:</label>
     <input type="text" id="location"  name="location" />
 
     <input type="submit" value="submit"/>
   </div>
 </form>
 
-<img src="data:image/jpeg;base64,{{inserted}}" height=100px width=100px alt="No image"/>
+<img class="card-img-top" src="data:image/jpeg;base64,{{inserted}}" height=200px width=200px alt="IMAGE TO BE UPLOADED"/>
 <br>
 <br>
+-->
+<br>
+<br>
+<div class="row">
+
+    <div class="col-3">
+    </div>
+    <div class="col-4">
+        <div class="card " style="width: %80; height:%80;">
+          <img class="card-img-top" style="width: %70; height:%70;" src="data:image/jpeg;base64,{{inserted}}" alt="IMAGE TO BE UPLOADED"/>
+          <div class="card-body">
+            <form class="was-validated" action="" method="post" enctype = "multipart/form-data">
+              <div class="custom-file">
+                <ul class="list-group-flush">
+
+                    <input type="file" id="filename" name="filename" />
+                    <li class="list-group-item">
+                        <label>Photography Name:</label>
+                        <input type="text" id="photo_name" name="photo_name" />
+                    </li>
+                    <li class="list-group-item">
+                        <label>Category Information:</label>
+                        <input type="text" id="category" name="category" />
+                    </li>
+                    <li class="list-group-item">
+                        <label>Techical Details:</label>
+                        <input type="text" id="details" name="details" />
+                    </li>
+                    <li class="list-group-item">
+
+                        <label> The Location Information:</label>
+                        <input type="text" id="location"  name="location" />
+                    </li>
+                    <li class="list-group-item">
+                        <input type="submit" value="submit"/>
+                    </li>
+                </ul>
+              </div>
+            </form>
+          </div>
+        </div>
+    </div>
+    <div class="col-3">
+    </div>
+
+</div>
 
 {% endblock %}
