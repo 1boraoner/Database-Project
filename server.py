@@ -265,17 +265,40 @@ def create_exhibition(name):
 @app.route("/artist/<name>/exhibition", methods=["GET","POST"])
 def exhibition(name):
 
-    if "flag" in session:
-        curr_artist_id = session["occupy_id"]
-    else:
-        return render_template("home_page.html")
-
-
     if request.method == "GET":
-        
 
+        current_artist = session["occupy_id"]
+        print(current_artist)
 
-        return render_template("exhibition.html")
+        with dbapi2.connect(url) as connection:
+            cursor = connection.cursor()
+
+            cmd = """SELECT * FROM exhibition WHERE exhibition_id=%s"""
+            cursor.execute(cmd,(current_artist,))
+            the_exhibition = cursor.fetchone()
+            connection.commit()
+
+            cmd = """SELECT photo_id FROM exib_content WHERE artist_id=%s """
+            cursor.execute(cmd,(current_artist,))
+            the_exhibition_content =cursor.fetchall()
+            connection.commit()
+
+            photos_raw = list()
+            for photo_id in the_exhibition_content:
+                cmd = """SELECT * FROM photograph WHERE photo_id=%s"""
+                cursor.execute(cmd, (photo_id[0],))
+                photos_raw.append(cursor.fetchall())
+
+            cursor.close()
+
+        photos =list()
+        for i in range(len(photos_raw)):
+            photos.append(photos_raw[i][0][7])
+            photos[i] = photos[i].tobytes()
+            photos[i] = base64.b64encode(photos[i])  ##b64 encoding
+            photos[i] = photos[i].decode()
+
+        return render_template("exhibition.html", exhib_inf=the_exhibition, photos=photos, photos_raw = photos_raw)
 
 
 
@@ -324,8 +347,6 @@ def user_page():
         print(len(photos))
 
     return render_template("user_page.html",user_inf = user_inf, fav_inf = fav_list_name, photos=photos, photos_raw=photos_raw )
-
-
 
 @app.route("/home/deneme", methods=["GET","POST"]) ##platform main page sends {exhibition_ids,exhib_name} and artist_ids, artist_name_surname
 def deneme():
@@ -421,10 +442,40 @@ def artist_res(name,aid):
             cursor.close()
         return redirect(url_for("user_page"))
 
-@app.route("/platform/exhibitions/<exhib_name><eid>",methods=["GET","POST"])
-def exhib_ser(exhib_name,eid):
+@app.route("/platform/exhibitions/<eid>",methods=["GET","POST"])
+def exhib_ser(eid):
+    if request.method == "GET":
+        with dbapi2.connect(url) as connection:
+            cursor = connection.cursor()
 
-    return render_template("exhibition_pub.html")
+            cmd = """SELECT * FROM exhibition WHERE exhibition_id=%s"""
+            cursor.execute(cmd,(eid,))
+            the_exhibition = cursor.fetchone()
+            connection.commit()
+
+            cmd = """SELECT photo_id FROM exib_content WHERE exhibition_id=%s """
+            cursor.execute(cmd,(eid,))
+            the_exhibition_content =cursor.fetchall()
+            connection.commit()
+
+            photos_raw = list()
+            for photo_id in the_exhibition_content:
+                cmd = """SELECT * FROM photograph WHERE photo_id=%s"""
+                cursor.execute(cmd, (photo_id[0],))
+                photos_raw.append(cursor.fetchall())
+
+            cursor.close()
+
+        photos =list()
+        for i in range(len(photos_raw)):
+            photos.append(photos_raw[i][0][7])
+            photos[i] = photos[i].tobytes()
+            photos[i] = base64.b64encode(photos[i])  ##b64 encoding
+            photos[i] = photos[i].decode()
+
+
+
+    return render_template("exhibition_pub.html", exhib_inf = the_exhibition, photos=photos, photos_raw =photos_raw)
 
 
 if __name__ == "__main__":
