@@ -11,8 +11,12 @@ class user:
         self.password =  password
         #self.fav_list_id = np.random.randint(0,high = 10000,dtype=int)
         #self.fav_list_table = fav_list(self.fav_list_id)
-        #self.userid = 0
-    
+        self.userid = 0
+
+    def user_id_setter(self,id):
+        self.userid = id
+
+
 class fav_list:
 
     def __init__(self,id):

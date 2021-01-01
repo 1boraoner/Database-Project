@@ -8,6 +8,9 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 import io
 import base64
+from datetime import datetime
+
+
 from random import randint
 
 url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
@@ -16,6 +19,7 @@ app.secret_key = "victoriasecret"
 
 @app.route("/")
 def home_page():
+    session["flag"] = 0
     return render_template('home_page.html')
 
 
@@ -68,7 +72,7 @@ def login_page():
     if request.method == "POST":
         data = request.form
         print(data)
-        if data["type"] == "on": #check box is ticked
+        if 'type' in data.keys(): #check box is ticked
             with dbapi2.connect(url) as connection:
                 cursor = connection.cursor()
                 cursor.execute('''SELECT * FROM photographer''')
@@ -84,35 +88,45 @@ def login_page():
                     session["flag"] = 1
                     session["type"] = "artist"
                     session["occupy_id"] = sess_artist.artist_id
+                    session["occupy_name"]= str(sess_artist.name)+"_"+str(sess_artist.surname)
                     print(session)
                     print(sess_artist)
 
                     return redirect(url_for("artist_page", name =str(sess_artist.name)+"_"+str(sess_artist.surname)))
         else:
-            sess_user = entity.artist(data["name"], data["surname"], data["password"])
             with dbapi2.connect(url) as connection:
                 cursor = connection.cursor()
                 cursor.execute('''SELECT * FROM users''')
                 table = cursor.fetchall()
                 cursor.close()
-
+            print(data)
+            print(table)
             for rows in table:
-                if data["name"] == rows[1] and data["surname"] == rows[2] and data["password"] == rows[6]:
-                    sess_user = entity.artist(rows[1], rows[2], rows[3], rows[4], rows[5], rows[6])
-                    sess_user.artist_id_setter(rows[0])
+                if data["name"] == rows[1] and data["surname"] == rows[2] and data["password"] == str(rows[4]):
+
+                    sess_user = entity.user(rows[1], rows[2], rows[3], rows[4])
+                    sess_user.user_id_setter(rows[0])
 
                     session["flag"] = 1           #logged in flag
                     session["type"] = "user"      #log in type
-                    session["occupy"] = sess_user #session variable
-                    return render_template(url_for("user_page"))
+                    session["occupy_id"] = sess_user.userid #session variable
+                    session["occupy_name"] = str(rows[1]) + " " + str(rows[2])
+                    print(sess_user.userid)
+
+                    return redirect(url_for("deneme"))
 
 
     return render_template("login_page.html")
 
 
-@app.route("/artist")
-def main_artist():
-    return "This is the artist_page"
+@app.route("/logout")
+def logout_page():
+    session.pop("flag")
+    session.pop("occupy_id")
+    session.pop("occupy_name")
+    session.pop("type")
+    session["flag"] = 0
+    return render_template("home_page.html")
 
 @app.route("/artist/<name>", methods=["GET","POST"])
 def artist_page(name):
@@ -267,7 +281,49 @@ def exhibition(name):
 
 @app.route("/home/user_page")
 def user_page():
-    return render_template("user_page.html")
+
+    with dbapi2.connect(url) as connection:
+        cursor = connection.cursor()
+        cmd = """SELECT fav_list_id,list_name FROM fav_list WHERE user_id=%s"""
+        cursor.execute(cmd,(session["occupy_id"],))
+        fav_inf = cursor.fetchone()
+        fav_id = fav_inf[0]
+        fav_list_name = fav_inf[1]
+        connection.commit()
+        print(fav_inf)
+
+        cmd_2 = '''SELECT* FROM fav_content WHERE fav_list_id = %s'''
+        cursor.execute(cmd_2,(fav_id,))
+        connection.commit()
+        photos_fav = cursor.fetchall()
+
+        print(photos_fav)
+
+        photos_raw = list()
+        for photo_id in photos_fav:
+            cmd = """SELECT * FROM photograph WHERE photo_id=%s"""
+            cursor.execute(cmd, (photo_id[0],))
+            photos_raw.append(cursor.fetchall())
+        print(len(photos_raw))
+        print(photos_raw)
+
+        cmd_3 = '''SELECT* FROM users WHERE user_id = %s'''
+        cursor.execute(cmd_3, (session["occupy_id"],))
+        connection.commit()
+        user_inf = cursor.fetchone()
+        cursor.close()
+
+
+        photos =list()
+        for i in range(len(photos_raw)):
+            photos.append(photos_raw[i][0][7])
+            photos[i] = photos[i].tobytes()
+            photos[i] = base64.b64encode(photos[i])  ##b64 encoding
+            photos[i] = photos[i].decode()
+
+        print(len(photos))
+
+    return render_template("user_page.html",user_inf = user_inf, fav_inf = fav_list_name, photos=photos, photos_raw=photos_raw )
 
 
 
@@ -296,7 +352,7 @@ def deneme():
         dict_exhb = dict()
 
         for i in range(len(art_data)):
-            dict_art.update({art_data[i][0] : str(str(art_data[i][1]) +" " + str(art_data[i][2]))})
+            dict_art.update({art_data[i][0] : str(str(art_data[i][1]) +"_" + str(art_data[i][2]))})
 
         for j in range(len(exhb_data)):
             dict_exhb.update({exhb_data[j][0]: str(exhb_data[j][1])})
@@ -305,9 +361,15 @@ def deneme():
 
     return render_template("platform.html", artists  = dict_art, exhibs = dict_exhb)
 
-@app.route("/platform/exhibs/<name><aid>", methods=["GET","POST"]) ##print artist_portfolio
+@app.route("/platform/<name><aid>", methods=["GET","POST"]) ##print artist_portfolio
 def artist_res(name,aid):
-    print(aid)
+    if "flag" not in session:
+        return render_template("home_page.html")
+
+    user_flag = False
+    if session["type"] == "user":
+        user_flag = True
+
     if request.method == "GET":
 
         with dbapi2.connect(url) as connection:
@@ -338,10 +400,28 @@ def artist_res(name,aid):
                 photos[i] = base64.b64encode(photos[i])  ##b64 encoding
                 photos[i] = photos[i].decode()
 
-    return render_template("artist_res.html", artist = curr_artist, portfolio = portfolio, photos_raw =photos_raw, photos =photos)
+        return render_template("artist_res.html", artist = curr_artist, portfolio = portfolio, photos_raw =photos_raw, photos =photos, user_flag=user_flag)
 
+    if request.method == "POST":
+        photo_ids = request.form.getlist("user_fav_add")
 
-@app.route("/platform/<exhib_name><eid>",methods=["GET","POST"])
+        with dbapi2.connect(url) as connection:
+            cursor = connection.cursor()
+            cmd = """SELECT user_id FROM fav_list WHERE user_id=%s"""
+            cursor.execute(cmd, (session["occupy_id"],))
+            fav_id = cursor.fetchone()
+            connection.commit()
+            print(fav_id)
+
+            for photo_id in photo_ids:
+                cmd_2 = '''INSERT INTO fav_content(photo_id,fav_list_id) VALUES(%s,%s)'''
+                cursor.execute(cmd_2, (photo_id, fav_id))
+                connection.commit()
+
+            cursor.close()
+        return redirect(url_for("user_page"))
+
+@app.route("/platform/exhibitions/<exhib_name><eid>",methods=["GET","POST"])
 def exhib_ser(exhib_name,eid):
 
     return render_template("exhibition_pub.html")

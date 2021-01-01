@@ -73,9 +73,10 @@ INIT_DB = [
     )""",
 
     """CREATE TABLE IF NOT EXISTS fav_content(
+        entry_number SERIAL,
         photo_id INT NOT NULL,
         fav_list_id INT NOT NULL,
-        PRIMARY KEY(photo_id)
+        PRIMARY KEY(entry_number)
     )"""
 ]
 url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
