@@ -79,10 +79,14 @@ INIT_DB = [
         PRIMARY KEY(entry_number)
     )"""
 ]
+#url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
+#DB_HOST ="localhost"
+#DB_NAME ="postgres"
+#DB_USER ="postgers"
+#DB_PASS ="bora"
 
-url = os.getenv("DATABASE_URL")
 
-def init_database():
+def init_database(url):
     print("CONNECTING TO DB")
     with dbapi2.connect(url) as connection:
         cursor = connection.cursor()
