@@ -1,18 +1,17 @@
 from flask import Flask, render_template, request, session, url_for, redirect
-import jinja2 as jin
-import db_init
 import psycopg2 as dbapi2
-import classes as entity
 import base64
-import os
-
 from random import randint
 
-url = os.getenv("DATABASE_URL")
+import db_init
+import classes as entity
+
+
+url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
 app = Flask(__name__)
 app.secret_key = "victoriasecret"
 
-@app.route("/")
+@app.route("/", methods=["GET","POST"])
 def home_page():
     session["flag"] = 0
     return render_template('home_page.html')
@@ -30,8 +29,6 @@ def signup_page():
                 new_inf = [new_artist.name,new_artist.surname,new_artist.nationality, new_artist.contact, new_artist.style, new_artist.password]
                 cursor.execute(cmd,new_inf)
                 the_artist_id = cursor.fetchone()[0]
-                print(the_artist_id)
-                print(type(the_artist_id))
 
                 connection.commit()
                 cmd = """ INSERT INTO portfolio(artist_id) VALUES(%s)"""
@@ -48,7 +45,6 @@ def signup_page():
                 cursor.execute(cmd,new_inf)
 
                 the_user_id = cursor.fetchone()[0]
-                print(the_user_id)
                 connection.commit()
 
                 full_name = str(new_user.name) + " "+ str(new_user.surname)
@@ -66,7 +62,6 @@ def login_page():
 
     if request.method == "POST":
         data = request.form
-        print(data)
         if 'type' in data.keys(): #check box is ticked
             with dbapi2.connect(url) as connection:
                 cursor = connection.cursor()
@@ -84,8 +79,7 @@ def login_page():
                     session["type"] = "artist"
                     session["occupy_id"] = sess_artist.artist_id
                     session["occupy_name"]= str(sess_artist.name)+"_"+str(sess_artist.surname)
-                    print(session)
-                    print(sess_artist)
+
 
                     return redirect(url_for("artist_page", name =str(sess_artist.name)+"_"+str(sess_artist.surname)))
         else:
@@ -94,8 +88,7 @@ def login_page():
                 cursor.execute('''SELECT * FROM users''')
                 table = cursor.fetchall()
                 cursor.close()
-            print(data)
-            print(table)
+
             for rows in table:
                 if data["name"] == rows[1] and data["surname"] == rows[2] and data["password"] == str(rows[4]):
 
@@ -106,7 +99,6 @@ def login_page():
                     session["type"] = "user"      #log in type
                     session["occupy_id"] = sess_user.userid #session variable
                     session["occupy_name"] = str(rows[1]) + " " + str(rows[2])
-                    print(sess_user.userid)
 
                     return redirect(url_for("deneme"))
 
@@ -130,38 +122,59 @@ def artist_page(name):
     else:
         return render_template("home_page.html")
 
-    if request.method == "GET":
+    if request.method == "POST":
 
+        to_delete = request.form.getlist("delete_this")
         with dbapi2.connect(url) as connection:
             cursor = connection.cursor()
-            cmd = """SELECT * FROM photographer WHERE artist_id=%s"""
-            cursor.execute(cmd,(curr_artist_id,))
-            curr_artist = cursor.fetchone()
+
+            for delete_id in to_delete:
+
+                cmd = """DELETE FROM photograph WHERE photo_id=%s"""
+                cursor.execute(cmd, (delete_id,))
+                connection.commit()
+
+                cmd = """DELETE FROM exib_content WHERE photo_id=%s"""
+                cursor.execute(cmd, (delete_id,))
+                connection.commit()
+
+                cmd = """DELETE FROM fav_content WHERE photo_id=%s"""
+                cursor.execute(cmd, (delete_id,))
+                connection.commit()
+
             cursor.close()
 
-        with dbapi2.connect(url) as connection:
-            cursor = connection.cursor()
-            cmd = """SELECT * FROM portfolio WHERE artist_id=%s"""
-            cursor.execute(cmd,(curr_artist_id,))
-            portfolio = cursor.fetchall()
-            cursor.close()
+    with dbapi2.connect(url) as connection:
+        cursor = connection.cursor()
+        cmd = """SELECT * FROM photographer WHERE artist_id=%s"""
+        cursor.execute(cmd,(curr_artist_id,))
+        curr_artist = cursor.fetchone()
+        cursor.close()
 
-        with dbapi2.connect(url) as connection:
-            cursor = connection.cursor()
-            cmd = """SELECT * FROM photograph WHERE artist_id=%s"""
-            cursor.execute(cmd, (curr_artist_id,))
-            photos_raw = cursor.fetchall()
-            cursor.close()
+    with dbapi2.connect(url) as connection:
+        cursor = connection.cursor()
+        cmd = """SELECT * FROM portfolio WHERE artist_id=%s"""
+        cursor.execute(cmd,(curr_artist_id,))
+        portfolio = cursor.fetchall()
+        cursor.close()
 
-            photos =list()
-            for i in range(len(photos_raw)):
-                photos.append(photos_raw[i][7])
-                print(type(photos_raw[i][7])) ## image content index i değişebilir dikkat et
-                photos[i] = photos[i].tobytes()
-                photos[i] = base64.b64encode(photos[i])  ##b64 encoding
-                photos[i] = photos[i].decode()
-            print(photos)
-        return render_template("artist_page.html", name = name, artist_sess = curr_artist,artist_port = portfolio, photos_raw =photos_raw, photos =photos)
+    with dbapi2.connect(url) as connection:
+        cursor = connection.cursor()
+        cmd = """SELECT * FROM photograph WHERE artist_id=%s"""
+        cursor.execute(cmd, (curr_artist_id,))
+        photos_raw = cursor.fetchall()
+        cursor.close()
+
+        photos =list()
+        for i in range(len(photos_raw)):
+            photos.append(photos_raw[i][7])
+            photos[i] = photos[i].tobytes()
+            photos[i] = base64.b64encode(photos[i])  #b64 encoding
+            photos[i] = photos[i].decode()
+
+
+    return render_template("artist_page.html", name = name, artist_sess = curr_artist,artist_port = portfolio, photos_raw =photos_raw, photos =photos)
+
 
 
 
@@ -182,8 +195,6 @@ def upload(name):
 
         image = request.files["filename"]
         content = image.read()
-        print(content)
-        print(type(content))
 
         category = request.form["category"]
         location_info = request.form["details"]
@@ -199,13 +210,12 @@ def upload(name):
             cursor.close()
 
         image_s = inserted_im.tobytes()
-        encoded = base64.b64encode(image_s) ##b64 encoding
-        str=  encoded.decode() ## b' atar
+        encoded = base64.b64encode(image_s) #b64 encoding
+        str=  encoded.decode() # b' atar
 
-        return render_template("upload.html", name=name, inserted = str, raw = content) ##raw silinebilir debugda kullanılmıştı
+        return render_template("upload.html", name=name, inserted = str, raw = content) #raw silinebilir debugda kullanılmıştı
 
     if request.method == "GET":
-        print(name)
         return render_template("upload.html", name=name, inserted ="")
 
 
@@ -230,7 +240,7 @@ def create_exhibition(name):
         for i in range(len(photos_raw)):
             photos.append(photos_raw[i][7])
             photos[i] = photos[i].tobytes()
-            photos[i] = base64.b64encode(photos[i])  ##b64 encoding
+            photos[i] = base64.b64encode(photos[i])  #b64 encoding
             photos[i] = photos[i].decode()
 
     if request.method == "POST":
@@ -240,7 +250,6 @@ def create_exhibition(name):
         date_inf = request.form["date_inf"]
         duration = request.form["duration"]
         photo_ids = request.form.getlist("checked")
-        print(photo_ids)
 
         with dbapi2.connect(url) as connection:
             cursor = connection.cursor()
@@ -260,19 +269,34 @@ def create_exhibition(name):
 @app.route("/artist/<name>/exhibition", methods=["GET","POST"])
 def exhibition(name):
 
-    if request.method == "GET":
-
-        current_artist = session["occupy_id"]
-        print(current_artist)
+    if request.method == "POST":
+        eid = request.form["eid"]
 
         with dbapi2.connect(url) as connection:
             cursor = connection.cursor()
 
-            cmd = """SELECT * FROM exhibition WHERE exhibition_id=%s"""
+            cmd = """DELETE FROM exib_content WHERE exhibition_id=%s"""
+            cursor.execute(cmd, (eid,))
+            connection.commit()
+
+            cmd = """DELETE FROM exhibition WHERE exhibition_id=%s"""
+            cursor.execute(cmd, (eid,))
+            connection.commit()
+            cursor.close()
+
+        return redirect(url_for("deneme"))
+
+    if request.method == "GET":
+
+        current_artist = session["occupy_id"]
+
+        with dbapi2.connect(url) as connection:
+            cursor = connection.cursor()
+
+            cmd = """SELECT * FROM exhibition WHERE artist_id=%s"""
             cursor.execute(cmd,(current_artist,))
             the_exhibition = cursor.fetchone()
             connection.commit()
-
             cmd = """SELECT photo_id FROM exib_content WHERE artist_id=%s """
             cursor.execute(cmd,(current_artist,))
             the_exhibition_content =cursor.fetchall()
@@ -290,7 +314,7 @@ def exhibition(name):
         for i in range(len(photos_raw)):
             photos.append(photos_raw[i][0][7])
             photos[i] = photos[i].tobytes()
-            photos[i] = base64.b64encode(photos[i])  ##b64 encoding
+            photos[i] = base64.b64encode(photos[i])  #b64 encoding
             photos[i] = photos[i].decode()
 
         return render_template("exhibition.html", exhib_inf=the_exhibition, photos=photos, photos_raw = photos_raw)
@@ -308,22 +332,18 @@ def user_page():
         fav_id = fav_inf[0]
         fav_list_name = fav_inf[1]
         connection.commit()
-        print(fav_inf)
 
         cmd_2 = '''SELECT* FROM fav_content WHERE fav_list_id = %s'''
         cursor.execute(cmd_2,(fav_id,))
         connection.commit()
         photos_fav = cursor.fetchall()
 
-        print(photos_fav)
-
         photos_raw = list()
         for photo_id in photos_fav:
             cmd = """SELECT * FROM photograph WHERE photo_id=%s"""
             cursor.execute(cmd, (photo_id[0],))
             photos_raw.append(cursor.fetchall())
-        print(len(photos_raw))
-        print(photos_raw)
+            connection.commit()
 
         cmd_3 = '''SELECT* FROM users WHERE user_id = %s'''
         cursor.execute(cmd_3, (session["occupy_id"],))
@@ -331,25 +351,32 @@ def user_page():
         user_inf = cursor.fetchone()
         cursor.close()
 
+        photos_raw_clean = list()
+        for i in range(len(photos_raw)):
+            if len(photos_raw[i]) == 0 :
+                continue
+            else:
+                photos_raw_clean.append(photos_raw[i])
+        #photo_raw = filter(lambda x:len(x) != 0, photos_raw)
+
 
         photos =list()
-        for i in range(len(photos_raw)):
-            photos.append(photos_raw[i][0][7])
+        for i in range(len(photos_raw_clean)):
+            photos.append(photos_raw_clean[i][0][7])
             photos[i] = photos[i].tobytes()
-            photos[i] = base64.b64encode(photos[i])  ##b64 encoding
+            photos[i] = base64.b64encode(photos[i])  #b64 encoding
             photos[i] = photos[i].decode()
 
-        print(len(photos))
 
-    return render_template("user_page.html",user_inf = user_inf, fav_inf = fav_list_name, photos=photos, photos_raw=photos_raw )
+    return render_template("user_page.html",user_inf = user_inf, fav_inf = fav_list_name, photos=photos, photos_raw=photos_raw_clean )
 
-@app.route("/home/deneme", methods=["GET","POST"]) ##platform main page sends {exhibition_ids,exhib_name} and artist_ids, artist_name_surname
+@app.route("/home/deneme", methods=["GET","POST"]) #platform main page sends {exhibition_ids,exhib_name} and artist_ids, artist_name_surname
 def deneme():
 
     if request.method == "GET":
         with dbapi2.connect(url) as connection:
             cursor = connection.cursor()
-            cmd_1 = """SELECT artist_id,artist_name,artist_surname FROM photographer """ ##get all artist
+            cmd_1 = """SELECT artist_id,artist_name,artist_surname FROM photographer """ #get all artist
             cursor.execute(cmd_1)
             art_data = cursor.fetchall()
             connection.commit()
@@ -361,9 +388,6 @@ def deneme():
 
             cursor.close()
 
-        print(type(art_data[0][0]))
-        print(type(exhb_data))
-
         dict_art = dict()
         dict_exhb = dict()
 
@@ -372,12 +396,10 @@ def deneme():
 
         for j in range(len(exhb_data)):
             dict_exhb.update({exhb_data[j][0]: str(exhb_data[j][1])})
-        print(dict_exhb)
-        print(dict_art)
 
         return render_template("platform.html", artists  = dict_art, exhibs = dict_exhb)
 
-@app.route("/platform/<name><aid>", methods=["GET","POST"]) ##print artist_portfolio
+@app.route("/platform/<name><aid>", methods=["GET","POST"]) #print artist_portfolio
 def artist_res(name,aid):
     if "flag" not in session:
         return render_template("home_page.html")
@@ -413,7 +435,7 @@ def artist_res(name,aid):
             for i in range(len(photos_raw)):
                 photos.append(photos_raw[i][7])
                 photos[i] = photos[i].tobytes()
-                photos[i] = base64.b64encode(photos[i])  ##b64 encoding
+                photos[i] = base64.b64encode(photos[i])  #b64 encoding
                 photos[i] = photos[i].decode()
 
         return render_template("artist_res.html", artist = curr_artist, portfolio = portfolio, photos_raw =photos_raw, photos =photos, user_flag=user_flag)
@@ -427,7 +449,6 @@ def artist_res(name,aid):
             cursor.execute(cmd, (session["occupy_id"],))
             fav_id = cursor.fetchone()
             connection.commit()
-            print(fav_id)
 
             for photo_id in photo_ids:
                 cmd_2 = '''INSERT INTO fav_content(photo_id,fav_list_id) VALUES(%s,%s)'''
@@ -465,7 +486,7 @@ def exhib_ser(eid):
         for i in range(len(photos_raw)):
             photos.append(photos_raw[i][0][7])
             photos[i] = photos[i].tobytes()
-            photos[i] = base64.b64encode(photos[i])  ##b64 encoding
+            photos[i] = base64.b64encode(photos[i])  #b64 encoding
             photos[i] = photos[i].decode()
 
 
@@ -474,5 +495,5 @@ def exhib_ser(eid):
 
 
 if __name__ == "__main__":
-    db_init.init_database()
-    app.run(host="0.0.0.0", port=8080)#host="127.0.0.1"
+    #db_init.init_database()
+    app.run(host="127.0.0.1", port=8080, debug=True)#host="127.0.0.1"
