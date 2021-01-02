@@ -26,10 +26,10 @@
   <tbody>
   {% for i in range(photo_string|length) %}
     <tr>
-      <th scope="row">{{ photo_string[i][0] }}</th>
-      <td>{{ photo_string[i][1]  }} </td>
-      <td>{{ photo_string[i][2]  }}</td>
-      <td>{{ photo_string[i][3]  }}</td>
+      <th scope="row">{{ photo_string[i][3] }}</th>
+      <td>{{ photo_string[i][4]  }} </td>
+      <td>{{ photo_string[i][5]  }}</td>
+      <td>{{ photo_string[i][6]  }}</td>
       <td><img src="data:image/jpeg;base64,{{ photo_cont[i] }}" height=80px width=80px alt="No image" /> </td>
       <td> <input type="checkbox" name="checked" value="{{photo_string[i][0]}}"/></td>
     </tr>
