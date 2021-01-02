@@ -1,6 +1,4 @@
-import numpy as np
 import psycopg2 as dbapi2
-import json
 
 class user:
 

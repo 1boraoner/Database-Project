@@ -1,19 +1,14 @@
-from flask import Flask, render_template,current_app, request, session, url_for, jsonify, redirect
-from flask_login import LoginManager
+from flask import Flask, render_template, request, session, url_for, redirect
 import jinja2 as jin
 import db_init
 import psycopg2 as dbapi2
 import classes as entity
-from werkzeug.utils import secure_filename
-from PIL import Image
-import io
 import base64
-from datetime import datetime
-
+import os
 
 from random import randint
 
-url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
+url = os.getenv("DATABASE_URL")
 app = Flask(__name__)
 app.secret_key = "victoriasecret"
 
@@ -380,7 +375,7 @@ def deneme():
         print(dict_exhb)
         print(dict_art)
 
-    return render_template("platform.html", artists  = dict_art, exhibs = dict_exhb)
+        return render_template("platform.html", artists  = dict_art, exhibs = dict_exhb)
 
 @app.route("/platform/<name><aid>", methods=["GET","POST"]) ##print artist_portfolio
 def artist_res(name,aid):
@@ -475,9 +470,9 @@ def exhib_ser(eid):
 
 
 
-    return render_template("exhibition_pub.html", exhib_inf = the_exhibition, photos=photos, photos_raw =photos_raw)
+        return render_template("exhibition_pub.html", exhib_inf = the_exhibition, photos=photos, photos_raw =photos_raw)
 
 
 if __name__ == "__main__":
     db_init.init_database()
-    app.run(host="127.0.0.1", port=8080, debug=True)#host="127.0.0.1"
+    app.run(host="0.0.0.0", port=8080)#host="127.0.0.1"
