@@ -7,11 +7,11 @@ import db_init
 import classes as entity
 
 prod = False
-url=""" """
+
 if prod:
     url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
 else:
-    url="""postgres://dxdcjoibgnngbo:f09fbcfef73ee91b903c014779637c4fad74ed983e7a5a23b8b7ddc17c0510d7@ec2-52-203-49-58.compute-1.amazonaws.com:5432/dnt9bdiotnne"""
+    url=""" user='dxdcjoibgnngbo' password='f09fbcfef73ee91b903c014779637c4fad74ed983e7a5a23b8b7ddc17c0510d7' host='ec2-52-203-49-58.compute-1.amazonaws.com' port='5432' dbname='dnt9bdiotnne'"""
 
 app = Flask(__name__)
 app.secret_key = "victoriasecret"
