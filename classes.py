@@ -1,6 +1,4 @@
-import numpy as np
 import psycopg2 as dbapi2
-import json
 
 class user:
 
@@ -9,8 +7,6 @@ class user:
         self.surname = surname
         self.contact = contact
         self.password =  password
-        #self.fav_list_id = np.random.randint(0,high = 10000,dtype=int)
-        #self.fav_list_table = fav_list(self.fav_list_id)
         self.userid = 0
 
     def user_id_setter(self,id):
@@ -85,13 +81,3 @@ class photo:
         self.photo_id = photo_id
         self.artist_id= artist_id
     
-    # def get_ids(self):
-    #     dsn = """ user='bora' password='bora' host='localhost' port='5432' dbname='platform' """
-    #     with dbapi2.connect(dsn) as connection:
-    #
-    #         cursor = connection.cursor()
-    #         statement_artist = """ SELECT artist_id FROM photographer """
-    #         cursor.execute(statement_artist)
-    #         cursor.close()
-    #
-    #

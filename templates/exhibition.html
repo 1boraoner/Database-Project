@@ -15,10 +15,48 @@
     </div>
 </div>
 
-<form method="post">
-    <p><input type="submit" value="submit"/> END EXHBITION </p>
-    <input type="hidden" name="eid" value="{{exhib_inf[0]}}">
-</form>
+<div >
+    <form method="post">
+        <p><button class="btn btn-danger" type="submit" name="delete_exhibition" value="submit"/> End Exhibition </p>
+        <input type="hidden" name="eid" value="{{exhib_inf[0]}}"/>
+    </form>
+</div>
+<br/>
+<br/>
+
+<button type="button" id= "user_selection" onclick="func()"> Edit The Exhibition </button>
+<br/>
+<div id="update_exhibition" >
+    <div class="row">
+        <div class="col-3">     </div>
+        <div class="col-5 ">
+        <form method="post">
+            <div class="form-row">
+              <div class="col">
+                  <input class="form-control" type="text" id="exhibition_name" name="exhibition_name" placeholder="Exhibition Name"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="col">
+                  <input class="form-control" type="text" id="duration" name="duration" placeholder="Duration"/>
+              </div>
+              <div class="col">
+                  <input class="form-control" type="text" id="content_type" name="content_type" placeholder="Content"/>
+              </div>
+            </div>
+
+            <div class="form-group">
+                <label for="lab1">General Information About The Exhibition</label>
+                <textarea class="form-control" id="lab1" rows="3" id="exhbit_info" name="exhbit_info"></textarea>
+            </div>
+            <br>
+            <br>
+            <p><button class="btn btn-danger" type="submit" name="alter_exhibition" value="submit"/> Update Exhibition Content </p>
+            <input type="hidden" name="eid" value="{{exhib_inf[0]}}">
+        </form>
+        </div>
+    </div>
+</div>
 
 <br>
 <br>
@@ -43,6 +81,19 @@
 </div>
 </div>
 
+{% endblock %}
 
 
+{% block scripts %}
+    <script>
+        document.getElementById("update_exhibition").style.display = "none";
+        function func(){
+
+            if (document.getElementById("update_exhibition").style.display == "block"){
+                document.getElementById("update_exhibition").style.display = "none";
+            }else{
+                document.getElementById("update_exhibition").style.display = "block";
+            }
+        }
+    </script>
 {% endblock %}

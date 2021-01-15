@@ -57,6 +57,7 @@
                   <p class="card-text">Category =  {{photos_raw[i][4]}}</p>
                   <p class="card-text">Technical Details = {{photos_raw[i][5]}}</p>
                   <p class="card-text">Location Infortmation = {{photos_raw[i][6]}}</p>
+                  <a href="{{url_for('photo_edit', name = name, photo_id= photos_raw[i][0])}}"> Edit The Content</a>
                   <p> <input type="checkbox" name="delete_this" value="{{photos_raw[i][0]}}" /> DELETE THE PHOTO</p>
               </div>
             </div>

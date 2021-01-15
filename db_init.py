@@ -86,12 +86,6 @@ INIT_DB = [
         PRIMARY KEY(entry_number)
     )"""
 ]
-#url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
-#DB_HOST ="localhost"
-#DB_NAME ="postgres"
-#DB_USER ="postgers"
-#DB_PASS ="bora"
-
 
 def init_database(url):
     print("CONNECTING TO DB")
@@ -101,9 +95,4 @@ def init_database(url):
             cursor.execute(create_tables)
             connection.commit()
         cursor.close()
-
-
-# if __name__ == "__main__":
-#     print("DATABASE CREATED")
-#     init_database()
 
