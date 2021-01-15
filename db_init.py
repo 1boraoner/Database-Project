@@ -14,20 +14,13 @@ INIT_DB = [
         PRIMARY KEY(artist_id)
     )""",
 
-    """CREATE TABLE IF NOT EXISTS exib_content(
-        photo_id INT UNIQUE NOT NULL,
-        exhibition_id INT NOT NULL,
-        artist_id INT NOT NULL,
-        PRIMARY KEY(photo_id)
-    )""",
-
     """CREATE TABLE IF NOT EXISTS portfolio(
         portfolio_id SERIAL,
         artist_id INT NOT NULL,
         photo_num INT DEFAULT 0,
         create_date DATE NOT NULL DEFAULT CURRENT_DATE,
         summary VARCHAR(200) NULL,
-        FOREIGN KEY(artist_id) REFERENCES photographer(artist_id),
+        FOREIGN KEY(artist_id) REFERENCES photographer(artist_id) ON DELETE CASCADE,
         PRIMARY KEY(portfolio_id)
     )""",
 
@@ -40,18 +33,21 @@ INIT_DB = [
         location_info VARCHAR(150) NULL, 
         tec_details VARCHAR(200) NULL,
         image_cont BYTEA NOT NULL,
-        FOREIGN KEY(artist_id) REFERENCES photographer(artist_id),
-        FOREIGN KEY(portfolio_id) REFERENCES portfolio(portfolio_id),
+        FOREIGN KEY(artist_id) REFERENCES photographer(artist_id) ON DELETE CASCADE,
+        FOREIGN KEY(portfolio_id) REFERENCES portfolio(portfolio_id) ON DELETE CASCADE,
         PRIMARY KEY(photo_id)
     )""",
 
     """CREATE TABLE IF NOT EXISTS exhibition(
         exhibition_id INT UNIQUE NOT NULL,
         exhibition_name VARCHAR(100) NOT NULL,
-        date_inf VARCHAR(50) NULL,
-        duration INT NULL,
+        date_inf VARCHAR(50) NULL DEFAULT CURRENT_DATE,
+        duration VARCHAR(50) NULL,
         visitor_count INT DEFAULT 0,
+        exhbit_info VARCHAR(200) NULL,
+        content_type VARCHAR(100) NULL,
         artist_id INT NOT NULL,
+        FOREIGN KEY(artist_id) REFERENCES photographer(artist_id) ON DELETE CASCADE,
         PRIMARY KEY(exhibition_id)
     )""",
 
@@ -72,10 +68,21 @@ INIT_DB = [
         FOREIGN KEY(user_id) REFERENCES users(user_id)  
     )""",
 
+    """CREATE TABLE IF NOT EXISTS exib_content(
+        photo_id INT UNIQUE NOT NULL,
+        exhibition_id INT NOT NULL,
+        artist_id INT NOT NULL,
+        PRIMARY KEY(photo_id),
+        FOREIGN KEY(artist_id) REFERENCES photographer(artist_id) ON DELETE CASCADE,
+        FOREIGN KEY(exhibition_id) REFERENCES exhibition(exhibition_id)
+    )""",
+
     """CREATE TABLE IF NOT EXISTS fav_content(
         entry_number SERIAL,
         photo_id INT NOT NULL,
         fav_list_id INT NOT NULL,
+        FOREIGN KEY(photo_id) REFERENCES photograph(photo_id) ON DELETE CASCADE,
+        FOREIGN KEY(fav_list_id) REFERENCES fav_list(fav_list_id),
         PRIMARY KEY(entry_number)
     )"""
 ]

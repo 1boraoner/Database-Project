@@ -1,17 +1,19 @@
 from flask import Flask, render_template, request, session, url_for, redirect
-import psycopg2 as dbapi2
 import base64
 from random import randint
+import psycopg2 as dbapi2
 
 import db_init
 import classes as entity
 
-prod = False
 
+prod = True
 if prod:
     url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
 else:
     url=""" user='dxdcjoibgnngbo' password='f09fbcfef73ee91b903c014779637c4fad74ed983e7a5a23b8b7ddc17c0510d7' host='ec2-52-203-49-58.compute-1.amazonaws.com' port='5432' dbname='dnt9bdiotnne'"""
+
+#url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
 
 app = Flask(__name__)
 app.secret_key = "victoriasecret"
@@ -135,15 +137,15 @@ def artist_page(name):
 
             for delete_id in to_delete:
 
-                cmd = """DELETE FROM photograph WHERE photo_id=%s"""
-                cursor.execute(cmd, (delete_id,))
-                connection.commit()
-
                 cmd = """DELETE FROM exib_content WHERE photo_id=%s"""
                 cursor.execute(cmd, (delete_id,))
                 connection.commit()
 
                 cmd = """DELETE FROM fav_content WHERE photo_id=%s"""
+                cursor.execute(cmd, (delete_id,))
+                connection.commit()
+
+                cmd = """DELETE FROM photograph WHERE photo_id=%s"""
                 cursor.execute(cmd, (delete_id,))
                 connection.commit()
 
@@ -179,6 +181,43 @@ def artist_page(name):
 
 
     return render_template("artist_page.html", name = name, artist_sess = curr_artist,artist_port = portfolio, photos_raw =photos_raw, photos =photos)
+
+@app.route("/artist/<name>/alter", methods=["GET","POST"])
+def alter_artist(name):
+    if session["flag"] == 1:
+        curr_artist_id = session["occupy_id"]
+    else:
+        return render_template("home_page.html")
+
+    if request.method == "POST":
+
+        if "red_delete" in request.form:
+            red_button = request.form["red_delete"]
+            with dbapi2.connect(url) as connection:
+                cursor = connection.cursor()
+                cmd = """ DELETE FROM photographer WHERE artist_id = %s"""
+                cursor.execute(cmd, (curr_artist_id,))
+                connection.commit()
+                cursor.close()
+
+            return redirect(url_for('logout_page'))
+        if "yellow_change" in request.form:
+            yellow_button = request.form["yellow_change"]
+            name = request.form["name"]
+            sn = request.form["surname"]
+            nat= request.form["nationality"]
+            art = request.form["art_style"]
+            add = request.form["contact_add"]
+            pw = request.form["password"]
+
+            with dbapi2.connect(url) as connection:
+                cursor = connection.cursor()
+                cmd = """ UPDATE photographer SET(artist_name,artist_surname,nationality, artist_style,contact_add, password) = (%s,%s,%s,%s,%s,%s) WHERE artist_id = %s"""
+                cursor.execute(cmd,(name,sn,nat,art,add,pw,curr_artist_id))
+                connection.commit()
+                cursor.close()
+
+    return render_template("artist_update_delete.html",name=name)
 
 
 
@@ -250,16 +289,17 @@ def create_exhibition(name):
 
     if request.method == "POST":
 
-        exhb_id = randint(1,100000)
+        exhb_id = randint(1,1000000)
         exhb_name = request.form["exhb_name"]
-        date_inf = request.form["date_inf"]
+        exhbit_inf = request.form["exhbit_info"]
         duration = request.form["duration"]
+        content = request.form["content_type"]
         photo_ids = request.form.getlist("checked")
 
         with dbapi2.connect(url) as connection:
             cursor = connection.cursor()
-            cmd = """INSERT INTO exhibition(exhibition_id,exhibition_name,date_inf,duration,artist_id) VALUES(%s,%s,%s,%s,%s)"""
-            cursor.execute(cmd,(exhb_id,exhb_name,date_inf,duration,curr_artist_id))
+            cmd = """INSERT INTO exhibition(exhibition_id,exhibition_name,duration,exhbit_info,content_type,artist_id) VALUES(%s,%s,%s,%s,%s,%s)"""
+            cursor.execute(cmd,(exhb_id,exhb_name,duration,exhbit_inf,content,curr_artist_id))
             connection.commit()
             cmd = """INSERT INTO exib_content(photo_id, exhibition_id,artist_id) VALUES(%s,%s,%s)"""
             for id in photo_ids:
@@ -302,10 +342,14 @@ def exhibition(name):
             cursor.execute(cmd,(current_artist,))
             the_exhibition = cursor.fetchone()
             connection.commit()
-            cmd = """SELECT photo_id FROM exib_content WHERE artist_id=%s """
-            cursor.execute(cmd,(current_artist,))
+            if the_exhibition == None:
+                the_exhibition = [-1]
+            cmd = """SELECT photo_id FROM exib_content WHERE exhibition_id=%s """
+            cursor.execute(cmd,(the_exhibition[0],))
             the_exhibition_content =cursor.fetchall()
             connection.commit()
+
+            print(the_exhibition_content)
 
             photos_raw = list()
             for photo_id in the_exhibition_content:
@@ -323,7 +367,6 @@ def exhibition(name):
             photos[i] = photos[i].decode()
 
         return render_template("exhibition.html", exhib_inf=the_exhibition, photos=photos, photos_raw = photos_raw)
-
 
 
 @app.route("/home/user_page")
@@ -345,8 +388,9 @@ def user_page():
 
         photos_raw = list()
         for photo_id in photos_fav:
-            cmd = """SELECT * FROM photograph WHERE photo_id=%s"""
-            cursor.execute(cmd, (photo_id[0],))
+            #cmd = """SELECT * FROM photograph WHERE photo_id=%s"""
+            cmd = """SELECT photograph.*, photographer.artist_name, photographer.artist_surname FROM photograph INNER JOIN photographer ON photographer.artist_id = photograph.artist_id AND photograph.photo_id = %s"""
+            cursor.execute(cmd, (photo_id[1],))
             photos_raw.append(cursor.fetchall())
             connection.commit()
 
@@ -362,8 +406,6 @@ def user_page():
                 continue
             else:
                 photos_raw_clean.append(photos_raw[i])
-        #photo_raw = filter(lambda x:len(x) != 0, photos_raw)
-
 
         photos =list()
         for i in range(len(photos_raw_clean)):
@@ -386,23 +428,51 @@ def deneme():
             art_data = cursor.fetchall()
             connection.commit()
 
-            cmd_2 = """SELECT exhibition_id, exhibition_name FROM exhibition """
+            #cmd_2 = """SELECT exhibition_id, exhibition_name FROM exhibition """
+            cmd_2 = """SELECT artist_name,artist_surname,exhibition_name,date_inf,exhibition_id FROM photographer INNER JOIN exhibition ON exhibition.artist_id = photographer.artist_id"""
             cursor.execute(cmd_2)
             exhb_data = cursor.fetchall()
             connection.commit()
 
+            cmd_3 = """SELECT photographer.artist_name, photographer.artist_surname, COUNT(photo_id) AS sayı from photograph LEFT JOIN photographer ON photographer.artist_id = photograph.artist_id GROUP BY photographer.artist_name,photographer.artist_surname"""
+            cursor.execute(cmd_3)
+            stat1 = cursor.fetchall()
+            connection.commit()
+
+            cmd_4 = """SELECT COUNT(artist_id),nationality FROM photographer GROUP BY nationality"""
+            cursor.execute(cmd_4)
+            stat2 = cursor.fetchall()
+            connection.commit()
+
+            cmd_5 = """SELECT MAX(visitor_count),exhibition_name FROM exhibition GROUP BY exhibition_name"""
+            cursor.execute(cmd_5)
+            stat3 = cursor.fetchall()
+            connection.commit()
+
+            cmd_6 = """SELECT photo_name,y.count FROM photograph INNER JOIN (SELECT photo_id as pi , COUNT(photo_id) as count FROM fav_content GROUP BY photo_id)y ON photograph.photo_id = y.pi """
+            cursor.execute(cmd_6)
+            stat4 = cursor.fetchall()
+            connection.commit()
             cursor.close()
+
+        if len(stat4) != 0:
+            max_index = 0
+            for i in range(len(stat4)):
+                if stat4[i][1] > stat4[max_index][1]:
+                    max_index = i
+            stat4 = stat4[max_index]
 
         dict_art = dict()
         dict_exhb = dict()
 
         for i in range(len(art_data)):
-            dict_art.update({art_data[i][0] : str(str(art_data[i][1]) +"_" + str(art_data[i][2]))})
+            dict_art.update({art_data[i][0] : str(str(art_data[i][1]) +" " + str(art_data[i][2]))})
 
         for j in range(len(exhb_data)):
-            dict_exhb.update({exhb_data[j][0]: str(exhb_data[j][1])})
+            exb = entity.exhibiton(exhb_data[j][4], str(exhb_data[j][0]+ " " +exhb_data[j][1]),exhb_data[j][2],exhb_data[j][3] )
+            dict_exhb.update({j:exb})
 
-        return render_template("platform.html", artists  = dict_art, exhibs = dict_exhb)
+    return render_template("platform.html", artists  = dict_art, exhibs = dict_exhb,stat1=stat1, stat2=stat2, stat3= stat3, stat4 =stat4)
 
 @app.route("/platform/<name><aid>", methods=["GET","POST"]) #print artist_portfolio
 def artist_res(name,aid):
@@ -469,6 +539,9 @@ def exhib_ser(eid):
         with dbapi2.connect(url) as connection:
             cursor = connection.cursor()
 
+            cmd="""UPDATE exhibition SET visitor_count = visitor_count + 1 WHERE exhibition_id = %s"""
+            cursor.execute(cmd,(eid,))
+
             cmd = """SELECT * FROM exhibition WHERE exhibition_id=%s"""
             cursor.execute(cmd,(eid,))
             the_exhibition = cursor.fetchone()
@@ -496,7 +569,7 @@ def exhib_ser(eid):
 
 
 
-        return render_template("exhibition_pub.html", exhib_inf = the_exhibition, photos=photos, photos_raw =photos_raw)
+    return render_template("exhibition_pub.html", exhib_inf = the_exhibition, photos=photos, photos_raw =photos_raw)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,6 @@
+import numpy as np
 import psycopg2 as dbapi2
+import json
 
 class user:
 
@@ -56,16 +58,16 @@ class artist:
 
     def deserialize_json(self):
         return
+
+
 class exhibiton:
 
-    def __init__(self,id, artist_id, photo_num, photo_ids):
+    def __init__(self,id=0, name=0, ename=0,date=0,):
         self.exhibition_id = id
-        self.artist_id = artist_id
-        self.photo_num = 0
-        self.photo_ids = list()
+        self.artist_name = name
+        self.exhb_name = ename
+        self.date = date
 
-    def add_photo(self,photo_id):
-        self.photo_ids.append(photo_id)
 
 class photo:
 
