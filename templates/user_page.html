@@ -2,13 +2,15 @@
 {% block title %}User Profile{% endblock %}
 
 {% block content %}
-
+<br>
+<br>
+<br>
 <div class="row">
     <div class="col-2">
         <image src="{{url_for('static', filename='artist.png')}}"> </image>
     </div>
     <div class="col-6">
-        <p> Artist Full Name = {{user_inf[1]}} {{user_inf[2]}}</p>
+        <p> User Name = {{user_inf[1]}} {{user_inf[2]}}</p>
         <p> Nationality = {{user_inf[3]}}</p>
         <p> Contact Address = {{user_inf[4]}}</p>
     </div>
@@ -25,8 +27,9 @@
         <div class="col md-4">
           <div class="card shadow-sm">
             <img src="data:image/jpeg;base64,{{photos[i]}}" class=" rounded img-fluid " />
-              <p class="card-text"> Photographer Name = {{photos_raw[i][0][3]}}</p>
-              <p class="card-text"> Photograph Name = {{photos_raw[i][0][3]}}</p>
+              <p class="card-text">Photo Owner=  {{photos_raw[i][0][8]}} {{photos_raw[i][0][9]}} </p>
+              <p class="card-text">Photographer Name = {{photos_raw[i][0][3]}}</p>
+              <p class="card-text">Photograph Name = {{photos_raw[i][0][3]}}</p>
               <p class="card-text">Category =  {{photos_raw[i][0][4]}}</p>
               <p class="card-text">Location Infortmation = {{photos_raw[i][0][5]}}</p>
               <p class="card-text">Technical Details = {{photos_raw[i][0][6]}}</p>

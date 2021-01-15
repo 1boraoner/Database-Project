@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+{% block title %}Artist Resume Page{% endblock %}
+
+
+{% block content %}
+
+
+
+<br>
+<br>
+<br>
+<br>
+<div class="row justify-content-md-center">
+    <div class="card" style="width:500px">
+      <img class="card-img-top" src="{{url_for('static', filename='update.png')}}" alt="Card image">
+      <div class="card-img-overlay">
+       <form class="form-inline" method="post">
+           <div class="row">
+               <div class="col-5 lg-auto">
+                    <input class="form-control" type="text" id="name_a" name="name" placeholder="Name"/>
+                    <br/>
+                    <br/>
+                    <input class="form-control" type="text" id="surname_a" name="surname" placeholder="Surname"/>
+               </div>
+               <div class="col-3 lg-auto">
+                    <input class="form-control" type="text" id="nationality" name="nationality" placeholder="Nationality"/>
+                        <br/>
+                        <br/>
+                    <input class="form-control" type="text" id="art_style" name="art_style" placeholder="Art Style"/>
+                        <br/>
+                        <br/>
+               </div>
+           </div>
+           <div class="row center">
+               <input class="form-control" type="text" id="contact_add" name="contact_add" placeholder="Adress"/>
+               <input class="form-control" type="password" id="password_art" name="password" placeholder="Password"/>
+           </div>
+           <div class="col-5-center">
+               <br>
+               <br>
+               <br>
+               <button type="submit " name="yellow_change" value="update " class="btn btn-warning">Update Account</button>
+           </div>
+       </form>
+      </div>
+    </div>
+</div>
+<div class="row">
+
+<form  method="post">
+    <button type="submit " name="red_delete" value="delete "  class="btn btn-danger">DELETE ACCOUNT</button>
+    <div class="card text-white bg-danger mb-3" style="max-width: 18rem;">
+      <div class="card-header">WARNING!!</div>
+      <div class="card-body">
+        <p class="card-text">If you click this button all photos, information and content that you have created will be erased be carefull!!</p>
+      </div>
+    </div>
+    </form>
+</div>
+
+
+
+
+
+
+{% endblock %}
+

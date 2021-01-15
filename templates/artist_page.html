@@ -15,7 +15,8 @@
         <p> Preferred/Dominant Photo Style = {{artist_sess[5]}}</p>
     </div>
     <div class="col-4">
-        <p> Available Exhibition</p>
+        <p> Alter Profile </p>
+        <p><a href="{{url_for('alter_artist', name=name)}}"> Change Your Profile  </a> </p>
         <p> Exhibition Link </p>
         <p><a href="{{url_for('create_exhibition', name=name)}}"> Create an Exhibition </a> </p>
     </div>
@@ -63,6 +64,5 @@
     </div>
     </div>
 </form>
-
 
 {% endblock %}
