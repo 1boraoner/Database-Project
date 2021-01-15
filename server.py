@@ -7,7 +7,7 @@ import db_init
 import classes as entity
 
 
-prod = True
+prod = False
 url=""" """
 if prod:
     url = """ user='postgres' password='bora' host='localhost' port='5432' dbname='postgres' """
