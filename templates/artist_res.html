@@ -3,30 +3,32 @@
 
 
 {% block content %}
-<h1>{{artist[1] + artist[2]}}</h1>
-
-<div class="row">
+<h1 class="alert alert-danger" > Welcome To {{artist[1] +" "+ artist[2]}} 's HomePage </h1>
+<div class="row alert alert-secondary">
     <div class="col-2">
-        <image src="{{url_for('static', filename='artist.png')}}"> </image>
+        <image src="{{url_for('static', filename='artist.png')}}" width="300px" height="300px"> </image>
     </div>
-    <div class="col-6">
+    <div class="col-6 alert alert-info">
+        <br>
+        <br>
         <p> Artist Full Name = {{artist[1]}} {{artist[2]}}</p>
         <p> Nationality = {{artist[3]}}</p>
         <p> Contact Address = {{artist[4]}}</p>
         <p> Preferred/Dominant Photo Style = {{artist[5]}}</p>
     </div>
-    <div class="col-4">
+    <div class="col-4 alert alert-primary">
         <p> Available Exhibition</p>
         <p> Exhibition Link </p>
     </div>
 </div>
 
-<div class="row">
-    <div class ="col-9">
-        <p> {{portfolio[4]}}</p>
+<div class="row alert alert-warning">
+    <div class ="col-8">
+        Portfolio Summary:
+        <p> {{portfolio[0][4]}}</p>
     </div>
     <div class="row">
-        <p>Portfolio Creation Date = <time> {{portfolio[3]}}</time>  </p>
+        <p>Portfolio Creation Date = <time> {{portfolio[0][3]}}</time>  </p>
     </div>
 </div>
 
