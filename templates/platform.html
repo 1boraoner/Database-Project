@@ -3,17 +3,17 @@
 
 
 {% block content %}
-<div class="accordion" id="accordionExample">
+<div class="accordion" id="acord">
   <div class="card">
     <div class="card-header" id="headingOne">
       <h2 class="mb-0">
-        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        <button class="btn btn-link" onclick="func()"   type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
           Statistics
         </button>
       </h2>
     </div>
 
-    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+    <div id="one" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
       <div class="row">
         <div class="col-3">
           <div class="card-body">
@@ -104,11 +104,17 @@
 
 {% endblock %}
 
-{% block scripts %}
-  <script>
-        $(function () {
-            $('.collapse').collapse()
-        });
-  </script>
 
+{% block scripts %}
+    <script>
+        document.getElementById("one").style.display = "none";
+        function func(){
+
+            if (document.getElementById("one").style.display == "block"){
+                document.getElementById("one").style.display = "none";
+            }else{
+                document.getElementById("one").style.display = "block";
+            }
+        }
+    </script>
 {% endblock %}
