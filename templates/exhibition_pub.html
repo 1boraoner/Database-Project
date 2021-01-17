@@ -4,15 +4,29 @@
 
 {% block content %}
 
-
+<br>
+<br>
+<br>
 <div class="row">
     <div class="col-2">
-
+        <img src="{{url_for('static',filename='exhibition_icon.png')}}" height="300px" width="300px">
     </div>
     <div class="col-6">
+        <br>
+        <br>
         <p> Exhibition Full Name = {{exhib_inf[1]}}</p>
         <p> START DATE = {{exhib_inf[2]}}</p>
         <p> DURATION = {{exhib_inf[3]}}</p>
+        <p> Exhibition Contents' Style = {{exhib_inf[6]}}</p>
+    </div>
+</div>
+<br/>
+<br/>
+<div class="row">
+    <div class="col-5 mx-auto">
+        <div class="text-center">
+            <p>Exhibition Summary = {{exhib_inf[5]}}</p>
+        </div>
     </div>
 </div>
 
@@ -29,7 +43,6 @@
         <div class="col md-4">
           <div class="card shadow-sm">
             <img src="data:image/jpeg;base64,{{photos[i]}}" class=" rounded img-fluid " />
-              <p class="card-text"> Photographer Name = {{photos_raw[i][0][3]}}</p>
               <p class="card-text"> Photograph Name = {{photos_raw[i][0][3]}}</p>
               <p class="card-text">Category =  {{photos_raw[i][0][4]}}</p>
               <p class="card-text">Location Infortmation = {{photos_raw[i][0][5]}}</p>
