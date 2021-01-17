@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+{% block title %}Artist Resume Page{% endblock %}
+
+
+{% block content %}
+<h1 class="alert alert-danger" > Welcome To {{artist[1] +" "+ artist[2]}} 's HomePage </h1>
+<div class="row alert alert-secondary">
+    <div class="col-2">
+        <image src="{{url_for('static', filename='artist.png')}}" width="300px" height="300px"> </image>
+    </div>
+    <div class="col-6 alert alert-info">
+        <br>
+        <br>
+        <p> Artist Full Name = {{artist[1]}} {{artist[2]}}</p>
+        <p> Nationality = {{artist[3]}}</p>
+        <p> Contact Address = {{artist[4]}}</p>
+        <p> Preferred/Dominant Photo Style = {{artist[5]}}</p>
+    </div>
+    <div class="col-4 alert alert-primary">
+        <p> Available Exhibition</p>
+        <p> Exhibition Link </p>
+    </div>
+</div>
+
+<div class="row alert alert-warning">
+    <div class ="col-8">
+        Portfolio Summary:
+        <p> {{portfolio[0][4]}}</p>
+    </div>
+    <div class="row">
+        <p>Portfolio Creation Date = <time> {{portfolio[0][3]}}</time>  </p>
+    </div>
+</div>
+
+<form method="post">
+    <br>
+    <br>
+    {% if user_flag == True%}
+    <p><input type="submit" value="submit"/> Add Selected To My Favs</p>
+    {% endif %}
+    <div class="container">
+        <div class="row">
+      {% for i in range(photos_raw|length) %}
+        {% if loop.index%5 == 0 and loop.index != 0%}
+        </div>
+        <div class="row">
+        {% endif %}
+            <div class="col md-4">
+              <div class="card shadow-sm">
+                <img src="data:image/jpeg;base64,{{photos[i]}}" class=" rounded img-fluid " />
+                  <p class="card-text"> Photograph Name = {{photos_raw[i][3]}}</p>
+                  <p class="card-text">Category =  {{photos_raw[i][4]}}</p>
+                  <p class="card-text">Location Infortmation = {{photos_raw[i][5]}}</p>
+                  <p class="card-text">Technical Details = {{photos_raw[i][6]}}</p>
+                    {% if user_flag == True%}
+                        <p> <input type="checkbox" name="user_fav_add" value="{{photos_raw[i][0]}}"/> ADD TO MY FAVS</p>
+                    {% endif %}
+              </div>
+            </div>
+      {% endfor %}
+    </div>
+    </div>
+</form>
+
+
+
+
+{% endblock %}
