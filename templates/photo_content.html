@@ -5,15 +5,20 @@
 
 
 <form method="post">
-    <div class="col md-4">
-      <div class="card shadow-sm">
-        <img src="data:image/jpeg;base64,{{photo_content}}" class=" rounded img-fluid " />
-          <input class="card-text form-control" type="text" id="name" name="name" placeholder="Photograph Name"/>
-          <input class="card-text form-control" type="text" id="cat" name="cat" placeholder="Category"/>
-          <input class="card-text form-control" type="text" id="tec" name="tec" placeholder="Technical Details"/>
-          <input class="card-text form-control" type="text" id="loc" name="loc" placeholder="Location Infortmation"/>
-          <p> <input type="submit" name="update_this"/> Update The Information </p>
-      </div>
+    <div class="row">
+        <div class="col-4">
+        </div>
+    
+        <div class="col-4 center">
+          <div class="card shadow-sm">
+            <img src="data:image/jpeg;base64,{{photo_content}}" class=" rounded img-fluid " />
+              <input class="card-text form-control" type="text" id="name" name="name" placeholder="Photograph Name"/>
+              <input class="card-text form-control" type="text" id="cat" name="cat" placeholder="Category"/>
+              <input class="card-text form-control" type="text" id="tec" name="tec" placeholder="Technical Details"/>
+              <input class="card-text form-control" type="text" id="loc" name="loc" placeholder="Location Infortmation"/>
+              <button type="submit" name="update_this"> Update The Information</button>
+          </div>
+        </div>
     </div>
 </form>
 
