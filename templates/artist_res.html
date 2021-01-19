@@ -48,10 +48,10 @@
             <div class="col md-4">
               <div class="card shadow-sm">
                 <img src="data:image/jpeg;base64,{{photos[i]}}" class=" rounded img-fluid " />
-                  <p class="card-text"> Photograph Name = {{photos_raw[i][3]}}</p>
+                  <p class="card-text">Photograph Name = {{photos_raw[i][3]}}</p>
                   <p class="card-text">Category =  {{photos_raw[i][4]}}</p>
-                  <p class="card-text">Location Infortmation = {{photos_raw[i][5]}}</p>
-                  <p class="card-text">Technical Details = {{photos_raw[i][6]}}</p>
+                  <p class="card-text">Technical Details = {{photos_raw[i][5]}}</p>
+                  <p class="card-text">Location Infortmation = {{photos_raw[i][6]}}</p>
                     {% if user_flag == True%}
                         <p> <input type="checkbox" name="user_fav_add" value="{{photos_raw[i][0]}}"/> ADD TO MY FAVS</p>
                     {% endif %}
