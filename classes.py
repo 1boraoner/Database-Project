@@ -49,12 +49,6 @@ class artist:
     def create_exhibiton(self,exid):
         self.exhibition_id = exid
 
-    def conv_json(self):
-        return json.dumps(self, default=lambda o:o.__dict__, sort_keys=True, indent=4)
-
-    def deserialize_json(self):
-        return
-
 
 class exhibiton:
 
