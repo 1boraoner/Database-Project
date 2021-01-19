@@ -532,8 +532,8 @@ def deneme():
 
     return render_template("platform.html", artists  = dict_art, exhibs = dict_exhb,stat1=stat1, stat2=stat2, stat3= stat3, stat4 =stat4)
 
-@app.route("/platform/<name><aid>", methods=["GET","POST"]) #print artist_portfolio
-def artist_res(name,aid):
+@app.route("/platform/<aid>", methods=["GET","POST"]) #print artist_portfolio
+def artist_res(aid):
     if "flag" not in session:
         return render_template("home_page.html")
 
